@@ -30,6 +30,12 @@ export default class Demo extends Phaser.Scene {
     const gridCols = 13;
 
     const cards = []; // Array to store the card objects
+    let score = 0;
+    
+    let activeCard = this.add.sprite(0, 0, 'cardSheet', 14);
+    activeCard.value = 0;
+
+    let isMatched = false;
 
     for (let i = 0; i < gridRows; i++) {
       for (let j = 0; j < gridCols; j++) {
@@ -43,20 +49,34 @@ export default class Demo extends Phaser.Scene {
       }
     }
 
+    const cardContainer = this.add.container(50, 100, cards);
+    this.add.existing(cardContainer);
+
 
     cards.forEach(card => {
       card.setInteractive();
       card.on('pointerdown', () => {
-        // Card interaction logic
+        // Set the users active card to the card they clicked
+        console.log("old active card value", (activeCard.value + 1))        
+
         const cardValue = card.value;
 
         // Set the new frame of
         // the card from the sprite sheet
-        card.setFrame(card.value);
+        card.setFrame(cardValue);
 
-        const cardContainer = this.add.container(50, 100, cards);
-
-        this.add.existing(cardContainer);
+        if (isMatched == false) {
+          card.setFrame(cardValue)
+        } if (activeCard.value == cardValue) {
+          card.setFrame(cardValue)
+          score++;
+        } if (activeCard.value != cardValue) {
+          card.setFrame(14);
+        }
+        
+        activeCard = card;  
+        console.log("Current card is now: ", (activeCard.value + 1));
+        console.log("Score is now: " + score);
       });
     });
   }
