@@ -57,19 +57,39 @@ export default class MemoryMatchingScene extends Phaser.Scene {
     /**
      * Card interaction setup
      */
+
+    function fisherYatesShuffle(array) {
+      let currentIndex = array.length, temporaryValue, randomIndex;
+    
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+    
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+    
+      return array;
+    }
+    
+    const numPairs = 9; // Set the desired number of pairs
+    const cardValues = Array.from({ length: numPairs }, (_, index) => index + 1);
+    const shuffledCardValues = fisherYatesShuffle([...cardValues, ...cardValues]);
     
     for (let i = 0; i < gridRows; i++) {
       for (let j = 0; j < gridCols; j++) {
-        let card = this.add.sprite(j * cardWidth, i * cardHeight, 'cardSheet', 14); // 'cardBack' is the key for the face-down card image
-
+        let cardValue = shuffledCardValues.pop(); // Get the next card value
+        let card = this.add.sprite(j * cardWidth, i * cardHeight, 'cardSheet', 14); // Use cardValue as the frame number
+    
         // Set a custom value attribute
-        card.value = Phaser.Math.Between(0, 13);
+        card.value = cardValue;
         card.flipped = false;
         
         cards.push(card);
       }
     }
-
+    
     const cardContainer = this.add.container(250, 200, cards);
     this.add.existing(cardContainer);
 
