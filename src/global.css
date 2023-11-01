@@ -1,0 +1,8 @@
+body {
+  font-family: 'PixelFont', sans-serif;
+}
+
+@font-face {
+	font-family: 'PixelFont';
+	src: url('assets/pixelfont.ttf') format('truetype');
+}
