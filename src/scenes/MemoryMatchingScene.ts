@@ -3,7 +3,7 @@
  */
 import Phaser from 'phaser';
 
-export default class Demo extends Phaser.Scene {  
+export default class MemoryMatchingScene extends Phaser.Scene {  
   constructor() {
     super('MemoryMatchingScene');
   }
@@ -31,12 +31,22 @@ export default class Demo extends Phaser.Scene {
 
     const cards = []; // Array to store the card objects 
     
-    let score = 0;        
+    let score = 0;  
+    let scoreText;      
     let lastClickedCard = null; // Keep track of the card last clicked by the player   
+    let isMatching = false; // Helps prevent further input until the match is over
+
+    scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
+
+    // Assuming you have a function to update the score display
+    function updateScoreDisplay() {
+      // Update the score display on your game UI
+      // For example, if you have an HTML element with an id "scoreDisplay":
+      scoreText.setText(`Score: ${score}`);
+    }
 
     function flipCard (card) {
-      if (!card.getData('flipped')) {
-        console.log("Card not flipped yet");
+      if (!card.getData('flipped') && !isMatching) {
         card.setFrame(card.value);
         card.flipped = true; 
     
@@ -49,15 +59,18 @@ export default class Demo extends Phaser.Scene {
             // The cards match, keep them face-up
             // Add animations
             score++;
+            updateScoreDisplay();
           } else {
             // Cards do not match
             const lastCard = lastClickedCard;
+            isMatching = true; // Set flag to true while matching is in progress
 
             setTimeout(() => {
               card.setFrame(14);
               card.setData('flipped', false);
               lastCard.setFrame(14);
               lastCard.flipped = false;
+              isMatching = false; // Reset flag after matching is complete
             }, 1000);
           }
     
