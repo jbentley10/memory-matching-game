@@ -30,6 +30,7 @@ export default class MemoryMatchingScene extends Phaser.Scene {
     /**
      * Initial setup
      */
+    const self = this;
     // Setting up the cards and grid
     const cardWidth = 65;
     const cardHeight = 90;
@@ -113,6 +114,25 @@ export default class MemoryMatchingScene extends Phaser.Scene {
       scoreText.setText(`Score: ${score}`);
     }
 
+    function showYouWin() {
+      // Add a transparent overlay to the game screen
+      const overlay = self.add.graphics();
+      overlay.fillStyle(0x000000, 0.5);
+      overlay.fillRect(0, 0, self.game.config.width, self.game.config.height);
+
+      // Add the "You Win" message
+      const youWinText = self.add.text(self.game.config.width / 2, self.game.config.height / 2 - 50, 'You Win!', { fontFamily: 'PixelFont', fontSize: '64px', fill: '#fff' });
+      youWinText.setOrigin(0.5);
+
+      // Add the "Play again" button
+      const playAgainButton = self.add.text(self.game.config.width / 2, self.game.config.height / 2 + 50, 'Play again', { fontFamily: 'PixelFont', fontSize: '32px', fill: '#fff' });
+      playAgainButton.setOrigin(0.5);
+      playAgainButton.setInteractive();
+      playAgainButton.on('pointerdown', () => {
+        self.scene.restart();
+      });
+    }
+
     function flipCard (card) {
       if (!card.getData('flipped') && !isMatching) {
         card.setFrame(card.value);
@@ -128,6 +148,9 @@ export default class MemoryMatchingScene extends Phaser.Scene {
             // Add animations
             score++;
             updateScoreDisplay();
+            if (score >= 9) {
+              showYouWin();
+            }
           } else {
             // Cards do not match
             const lastCard = lastClickedCard;
@@ -147,7 +170,6 @@ export default class MemoryMatchingScene extends Phaser.Scene {
           lastClickedCard = card; // Set the last clicked card to current card
         }
       }
-      console.log(card.value);
     }
   }
 }
