@@ -3,7 +3,7 @@
  */
 import Phaser from 'phaser';
 
-export default class Demo extends Phaser.Scene {
+export default class Demo extends Phaser.Scene {  
   constructor() {
     super('MemoryMatchingScene');
   }
@@ -29,13 +29,44 @@ export default class Demo extends Phaser.Scene {
     const gridRows = 4; // Define the number of rows and columns in the grid
     const gridCols = 13;
 
-    const cards = []; // Array to store the card objects
-    let score = 0;
+    const cards = []; // Array to store the card objects 
     
-    let activeCard = this.add.sprite(0, 0, 'cardSheet', 14);
-    activeCard.value = 0;
+    let score = 0;        
+    let lastClickedCard = null; // Keep track of the card last clicked by the player   
 
-    let isMatched = false;
+    function flipCard (card) {
+      if (!card.getData('flipped')) {
+        console.log("Card not flipped yet");
+        card.setFrame(card.value);
+        card.flipped = true; 
+    
+        if (lastClickedCard) { 
+          // If a card was previously clicked
+          const lastValue = lastClickedCard.value;
+          const currentValue = card.value;
+    
+          if (lastValue === currentValue) {
+            // The cards match, keep them face-up
+            // Add animations
+            score++;
+          } else {
+            // Cards do not match
+            const lastCard = lastClickedCard;
+
+            setTimeout(() => {
+              card.setFrame(14);
+              card.setData('flipped', false);
+              lastCard.setFrame(14);
+              lastCard.flipped = false;
+            }, 1000);
+          }
+    
+          lastClickedCard = null; // Reset last clicked card
+        } else {
+          lastClickedCard = card; // Set the last clicked card to current card
+        }
+      }
+    }
 
     for (let i = 0; i < gridRows; i++) {
       for (let j = 0; j < gridCols; j++) {
@@ -43,8 +74,8 @@ export default class Demo extends Phaser.Scene {
 
         // Set a custom value attribute
         card.value = j + 1;
+        card.flipped = false;
         
-        const cardValue = card.getData('value');
         cards.push(card);
       }
     }
@@ -57,26 +88,7 @@ export default class Demo extends Phaser.Scene {
       card.setInteractive();
       card.on('pointerdown', () => {
         // Set the users active card to the card they clicked
-        console.log("old active card value", (activeCard.value + 1))        
-
-        const cardValue = card.value;
-
-        // Set the new frame of
-        // the card from the sprite sheet
-        card.setFrame(cardValue);
-
-        if (isMatched == false) {
-          card.setFrame(cardValue)
-        } if (activeCard.value == cardValue) {
-          card.setFrame(cardValue)
-          score++;
-        } if (activeCard.value != cardValue) {
-          card.setFrame(14);
-        }
-        
-        activeCard = card;  
-        console.log("Current card is now: ", (activeCard.value + 1));
-        console.log("Score is now: " + score);
+        flipCard(card);
       });
     });
   }
